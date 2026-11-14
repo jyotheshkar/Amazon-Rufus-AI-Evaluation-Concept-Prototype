@@ -7,6 +7,8 @@ import os
 from pathlib import Path
 
 import anthropic
+
+from backend.agents.product_context import build_product_context
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -73,30 +75,8 @@ class RufusAgent:
             raise
 
     def _build_product_context(self, products: list[dict]) -> str:
-        """Format retrieved products into a clean context string for the prompt."""
-        if not products:
-            return "No relevant products found in the catalogue."
-
-        lines = ["AVAILABLE PRODUCTS:\n"]
-        for i, p in enumerate(products, 1):
-            specs = p.get("specs", {})
-            spec_lines = []
-            for k, v in specs.items():
-                if v is None:
-                    continue
-                if isinstance(v, list):
-                    spec_lines.append(f"{k}: {', '.join(str(x) for x in v)}")
-                else:
-                    spec_lines.append(f"{k}: {v}")
-            specs_str = " | ".join(spec_lines) if spec_lines else "N/A"
-
-            lines.append(
-                f"{i}. {p['name']}\n"
-                f"   Price: £{p.get('price', 'N/A')} | Rating: {p.get('rating', 'N/A')}/5 | Brand: {p.get('brand', 'N/A')}\n"
-                f"   {specs_str}\n"
-                f"   Description: {p.get('description', '')}\n"
-            )
-        return "\n".join(lines)
+        """Share catalogue formatting with the evaluating agent."""
+        return build_product_context(products)
 
     def _build_user_prompt(self, query: str, product_context: str) -> str:
         """Combine the customer query and product context into the user message."""
@@ -104,7 +84,7 @@ class RufusAgent:
 
     def _mock_response(self, query: str, products: list[dict]) -> dict:
         """Return a static mock response for development — no API call made."""
-        with open(MOCK_PATH) as f:
+        with open(MOCK_PATH, encoding="utf-8") as f:
             mock = json.load(f)
         return {
             "answer": mock["mock_response"],
@@ -113,3 +93,4 @@ class RufusAgent:
             "products_used": [p["id"] for p in products],
             "usage": mock["usage"],
         }
+
