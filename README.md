@@ -1,4 +1,30 @@
-# Rufus Eval Engine
+# Amazon Rufus AI Evaluation Concept Prototype
+
+## Latest browser edition
+
+The latest web presentation is a dark blue evaluation workbench with six reproducible
+fixture scenarios, per-dimension reasoning, a machine-readable JSON export and detailed
+system/deployment architecture. Its source is [web/index.html](web/index.html).
+The browser edition runs locally without model calls; the original Python pipeline
+and Next.js dashboard remain the full retrieval-and-evaluation application.
+
+**Publication status:** the browser edition is ready in source. Sites publication is
+pending because the publishing environment could not resolve the Sites source host.
+No new live website URL is claimed. The existing external deployment link is
+[rufus-eval-engine.vercel.app](https://rufus-eval-engine.vercel.app/); it was not
+re-deployed or independently verified during this update.
+
+See [engineering design, decisions, schema boundaries and release checks](docs/ENGINEERING.md).
+The 14 November 2026 engineering update adds shared catalogue evidence for the answer
+and judge agents, rejects invalid scores before metrics/persistence, and calculates
+the standard fixture's correct weighted score of **8.8/10**.
+
+### Skills demonstrated
+
+Python async orchestration; retrieval-augmented generation; FAISS vector search;
+LLM evaluation and adversarial scenarios; strict data contracts; FastAPI; SQLite;
+Next.js; regression testing; system/deployment architecture; and reproducible
+technical communication. This independent portfolio project has no academic mark.
 
 ## Architecture and maintenance
 
@@ -175,3 +201,4 @@ every deployment or evaluation path has been tested.
 
 Phase notes under `docs/` record development history. The current implementation
 and reproducible check results take precedence over historical completion claims.
+
