@@ -202,3 +202,4 @@ every deployment or evaluation path has been tested.
 Phase notes under `docs/` record development history. The current implementation
 and reproducible check results take precedence over historical completion claims.
 
+**Year provenance:** The `2026` suffix records this repository's creation year (created 2026-03-29). Later maintenance retains its own dates.
