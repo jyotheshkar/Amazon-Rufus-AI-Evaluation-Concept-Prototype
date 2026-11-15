@@ -1,35 +1,15 @@
-# Amazon Rufus AI Evaluation Concept Prototype
+# Rufus Eval Engine
 
-## Latest browser edition
+**Hosted dashboard:** [rufus-eval-engine.vercel.app](https://rufus-eval-engine.vercel.app/)
 
-The latest web presentation is a dark blue evaluation workbench with six reproducible
-fixture scenarios, per-dimension reasoning, a machine-readable JSON export and detailed
-system/deployment architecture. Its source is [web/index.html](web/index.html).
-The browser edition runs locally without model calls; the original Python pipeline
-and Next.js dashboard remain the full retrieval-and-evaluation application.
-
-**Publication status:** the browser edition is ready in source. Sites publication is
-pending because the publishing environment could not resolve the Sites source host.
-No new live website URL is claimed. The existing external deployment link is
-[rufus-eval-engine.vercel.app](https://rufus-eval-engine.vercel.app/); it was not
-re-deployed or independently verified during this update.
-
-See [engineering design, decisions, schema boundaries and release checks](docs/ENGINEERING.md).
-The 14 November 2026 engineering update adds shared catalogue evidence for the answer
-and judge agents, rejects invalid scores before metrics/persistence, and calculates
-the standard fixture's correct weighted score of **8.8/10**.
-
-### Skills demonstrated
-
-Python async orchestration; retrieval-augmented generation; FAISS vector search;
-LLM evaluation and adversarial scenarios; strict data contracts; FastAPI; SQLite;
-Next.js; regression testing; system/deployment architecture; and reproducible
-technical communication. This independent portfolio project has no academic mark.
+The original application combines a Next.js dashboard with a Python evaluation
+pipeline and FastAPI service. Vercel hosts the dashboard; model execution, retrieval
+and SQLite storage belong to the separate backend. A ready frontend deployment
+alone does not establish backend availability or fresh evaluation results.
 
 ## Architecture and maintenance
 
-[Technical architecture, source boundaries, scalability decisions and verification](docs/ARCHITECTURE_MAINTENANCE.md) documents the current implementation and its limits. Maintenance dated 11 November 2026 is separate from the original study or project work.
-
+[Technical architecture, source boundaries, scalability decisions and verification](docs/ARCHITECTURE_MAINTENANCE.md) documents the original application's implementation and limits. The [restoration record](docs/RESTORATION.md) identifies the preserved source baseline and deployment boundaries. Maintenance is separate from the original project work.
 
 An independent portfolio prototype for evaluating a **simulated shopping assistant**.
 It combines product retrieval, generated answers, a four-dimension LLM judge,
@@ -171,7 +151,7 @@ These focused tests do not import FAISS, load embeddings, invoke paid models or
 write the evaluation database. They need only the two agent dependencies:
 
 ```bash
-python -m pip install anthropic==0.20.0 python-dotenv==1.0.0
+python -m pip install anthropic==0.20.0 python-dotenv==1.0.0 httpx==0.27.2
 python -m unittest discover -s tests/offline -v
 ```
 
@@ -188,8 +168,9 @@ every deployment or evaluation path has been tested.
 
 - This is a personal prototype, not a production Amazon system or a deployed
   customer service.
-- A live frontend/API pair has not been independently verified. Deployment
-  configuration in `render.yaml` is preparation, not a deployment receipt.
+- The existing Vercel frontend deployment was confirmed ready on 15 November
+  2026. Backend availability and live evaluation behaviour need separate checks;
+  `render.yaml` describes the backend deployment configuration.
 - LLM-judge assessments are not human-labelled ground truth. Agreement,
   calibration, bias and judge/assistant model dependence need evaluation.
 - The SQLite file committed under `backend/data` should not be treated as a
@@ -202,4 +183,5 @@ every deployment or evaluation path has been tested.
 Phase notes under `docs/` record development history. The current implementation
 and reproducible check results take precedence over historical completion claims.
 
-**Year provenance:** The `2026` suffix records this repository's creation year (created 2026-03-29). Later maintenance retains its own dates.
+**Year provenance:** The `2026` suffix records the repository's creation year
+(29 March 2026). Dated maintenance records retain their own dates.

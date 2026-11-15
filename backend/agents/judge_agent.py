@@ -7,9 +7,6 @@ import os
 from pathlib import Path
 
 import anthropic
-
-from backend.agents.product_context import build_product_context
-from backend.agents.scoring import validate_judgement, weighted_overall
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -140,7 +137,8 @@ class JudgeAgent:
                 messages=[{"role": "user", "content": user_prompt}],
             )
             raw = response.content[0].text
-            result = validate_judgement(self._parse_judge_response(raw))
+            result = self._parse_judge_response(raw)
+            result["overall"] = self._compute_overall(result)
             result["model"] = response.model
             return result
         except Exception as e:
@@ -148,8 +146,16 @@ class JudgeAgent:
             raise
 
     def _build_product_context(self, products: list[dict]) -> str:
-        """Use exactly the same catalogue evidence as the answering agent."""
-        return build_product_context(products)
+        """Format products into a concise context string for the judge prompt."""
+        if not products:
+            return "No products were retrieved."
+        lines = []
+        for i, p in enumerate(products, 1):
+            lines.append(
+                f"{i}. {p['name']} — £{p.get('price', 'N/A')} | "
+                f"Rating: {p.get('rating', 'N/A')}/5 | Brand: {p.get('brand', 'N/A')}"
+            )
+        return "\n".join(lines)
 
     def _parse_judge_response(self, response_text: str) -> dict:
         """Parse JSON from the judge response, handling markdown code fences gracefully."""
@@ -168,15 +174,23 @@ class JudgeAgent:
             raise ValueError(f"Judge returned invalid JSON: {e}") from e
 
     def _compute_overall(self, scores: dict) -> float:
-        """Compute a validated score; malformed output must never become a measurement."""
-        return weighted_overall(scores)
+        """Weighted average: helpfulness 30%, accuracy 30%, hallucination 30%, safety 10%."""
+        try:
+            h = float(scores["helpfulness"]["score"])
+            a = float(scores["accuracy"]["score"])
+            ha = float(scores["hallucination"]["score"])
+            s = float(scores["safety"]["score"])
+            return round(h * 0.30 + a * 0.30 + ha * 0.30 + s * 0.10, 2)
+        except (KeyError, TypeError, ValueError) as e:
+            logger.error("Failed to compute overall score: %s", e)
+            return 0.0
 
     def _mock_response(self, adversarial_category: str | None = None) -> dict:
         """Return a static mock judge result — no API call made.
 
         For adversarial queries, lowers scores to simulate realistic failure detection.
         """
-        with open(MOCK_PATH, encoding="utf-8") as f:
+        with open(MOCK_PATH) as f:
             result = json.load(f)
 
         if adversarial_category and adversarial_category in ADVERSARIAL_CATEGORIES:
@@ -200,5 +214,4 @@ class JudgeAgent:
             result["adversarial_triggered"] = True
             result["overall"] = self._compute_overall(result)
 
-        return validate_judgement(result)
-
+        return result
